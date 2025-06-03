@@ -15,7 +15,7 @@ async def generate_env_and_save(
     game_description: str,
     prompt: str,
     model: str,
-    max_tokens: int,
+    max_completion_tokens: int,
     usage_tracker: UsageTracker,
     pbar: tqdm.tqdm,
 ) -> None:
@@ -27,7 +27,7 @@ async def generate_env_and_save(
         game_description (str): The description of the game.
         prompt (str): The instruction prompt for generating the environment.
         model (str): The name of the model to use for chat completion.
-        max_tokens (int): The maximum number of tokens to generate.
+        max_completion_tokens (int): The maximum number of tokens to generate.
         usage_tracker (UsageTracker): The usage tracker object.
         pbar (tqdm.tqdm): A progress bar to update after generation.
 
@@ -42,7 +42,7 @@ async def generate_env_and_save(
         response = await chat_completion_async(
             model=model,
             messages=[Message(role="user", content=prompt)],
-            max_tokens=max_tokens,
+            max_completion_tokens=max_completion_tokens,
             usage_tracker=usage_tracker,
         )
     except Exception as e:
@@ -65,7 +65,7 @@ async def main() -> None:
 
     prompt = config["prompt"]
     model = config["model"]
-    max_tokens = config["max_tokens"]
+    max_completion_tokens = config["max_completion_tokens"]
     num_games = config["num_games"]
 
     if not os.path.exists("gg_bench/data/envs"):
@@ -93,7 +93,7 @@ async def main() -> None:
                     game_description=game_description,
                     prompt=prompt,
                     model=model,
-                    max_tokens=max_tokens,
+                    max_completion_tokens=max_completion_tokens,
                     usage_tracker=usage_tracker,
                     pbar=pbar,
                 )

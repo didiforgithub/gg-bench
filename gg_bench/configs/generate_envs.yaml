@@ -1,13 +1,22 @@
 prompt: |
   <GameDescription>
 
-  Given this description, write a gym environment that implements this game. Use gymnasium's API to define the environment. The action_space of the environment should be a Discrete space, use spaces.Discrete to define the action_space. The observation_space should be a Box space, use spaces. The reward should be 1 if the current player wins, and -10 if the current player has played a valid move. The environment should internally manage automatically switching between each player, it should be designed for self-play reinforcement learning.
+  Given this description, write a gym environment that implements this single-player puzzle game. Use gymnasium's API to define the environment. The action_space of the environment should be a Discrete space, use spaces.Discrete to define the action_space. The observation_space should be a Box space, use spaces.Box to define it. 
+  
+  The reward system should be:
+  - +100 if the player successfully solves the puzzle
+  - -1 for each step taken (to encourage efficiency)
+  - -50 if the player reaches a failure state (if applicable)
+  - 0 for regular valid moves that don't end the game
+
+  The environment should be designed for single-agent reinforcement learning.
 
   The environment should have the following methods:
   - `reset()`: Reset the environment to its initial state. Returns observation, info (dict).
-  - `step(action)`: Take a step in the environment. Returns observation, reward, done, info (dict).
+  - `step(action)`: Take a step in the environment. Returns observation, reward, terminated, truncated, info (dict).
   - `render()`: Return a visual representation of the environment state as a string.
   - `valid_moves()`: Return a list of integers of valid moves as indices of the action_space.
+  - `is_solved()`: Return True if the puzzle is solved, False otherwise.
 
   Here is an example of how to define the environment:
   ```python
@@ -16,82 +25,90 @@ prompt: |
   from gymnasium import spaces
 
 
-  class TicTacToeEnv(gym.Env):
-      def __init__(self):
-          super(TicTacToeEnv, self).__init__()
-
-          # Define action and observation space
-          self.action_space = spaces.Discrete(9)
+  class SokobanEnv(gym.Env):
+      def __init__(self, level_size=5):
+          super(SokobanEnv, self).__init__()
+          
+          self.level_size = level_size
+          
+          # Define action space: 0=up, 1=down, 2=left, 3=right
+          self.action_space = spaces.Discrete(4)
+          
+          # Define observation space (flattened grid)
+          # 0=empty, 1=wall, 2=box, 3=target, 4=player, 5=box_on_target
           self.observation_space = spaces.Box(
-              low=-1, high=1, shape=(9,), dtype=np.float32
+              low=0, high=5, shape=(level_size * level_size,), dtype=np.float32
           )
-
-          # Initialize the board
+          
           self.reset()
 
       def reset(self, seed=None, options=None):
           super().reset(seed=seed)
-          self.board = np.zeros(9, dtype=np.float32)
-          self.current_player = 1
+          
+          # Initialize simple level
+          self.grid = np.zeros((self.level_size, self.level_size), dtype=np.float32)
+          
+          # Add walls around border
+          self.grid[0, :] = 1
+          self.grid[-1, :] = 1
+          self.grid[:, 0] = 1
+          self.grid[:, -1] = 1
+          
+          # Add player, box, and target
+          self.player_pos = [1, 1]
+          self.grid[1, 1] = 4  # player
+          self.grid[2, 2] = 2  # box
+          self.grid[3, 3] = 3  # target
+          
           self.done = False
-          return self.board, {}  # Return observation and info
+          return self.grid.flatten(), {}
 
       def step(self, action):
-          if self.board[action] != 0 or self.done:
-              return (
-                  self.board,
-                  -10,
-                  True,
-                  False,
-                  {},
-              )  # Observation, reward, terminated, truncated, info
-
-          self.board[action] = self.current_player
-
-          # Check for win
-          win_combinations = [
-              [0, 1, 2],
-              [3, 4, 5],
-              [6, 7, 8],  # Rows
-              [0, 3, 6],
-              [1, 4, 7],
-              [2, 5, 8],  # Columns
-              [0, 4, 8],
-              [2, 4, 6],  # Diagonals
-          ]
-
-          for combo in win_combinations:
-              if all(self.board[i] == self.current_player for i in combo):
-                  self.done = True
-                  return self.board, 1, True, False, {}
-
-          # Check for draw
-          if np.all(self.board != 0):
+          if self.done:
+              return self.grid.flatten(), 0, True, False, {}
+          
+          # Define movement directions
+          moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # up, down, left, right
+          dy, dx = moves[action]
+          
+          new_y, new_x = self.player_pos[0] + dy, self.player_pos[1] + dx
+          
+          # Check bounds and walls
+          if (new_y < 0 or new_y >= self.level_size or 
+              new_x < 0 or new_x >= self.level_size or 
+              self.grid[new_y, new_x] == 1):
+              return self.grid.flatten(), -1, False, False, {}
+          
+          # Move player
+          self.grid[self.player_pos[0], self.player_pos[1]] = 0
+          self.player_pos = [new_y, new_x]
+          self.grid[new_y, new_x] = 4
+          
+          # Check if solved
+          if self.is_solved():
               self.done = True
-              return self.board, 0, True, False, {}
-
-          self.current_player *= -1
-          return self.board, 0, False, False, {}
+              return self.grid.flatten(), 100, True, False, {}
+          
+          return self.grid.flatten(), -1, False, False, {}
 
       def render(self):
-          board_str = "-------------\n"
-          for i in range(3):
-              board_str += "|"
-              for j in range(3):
-                  if self.board[i * 3 + j] == 1:
-                      board_str += " X |"
-                  elif self.board[i * 3 + j] == -1:
-                      board_str += " O |"
-                  else:
-                      board_str += "   |"
-              board_str += "\n-------------\n"
-          return board_str
+          symbols = {0: ' ', 1: '#', 2: '$', 3: '.', 4: '@', 5: '*'}
+          result = ""
+          for row in self.grid:
+              for cell in row:
+                  result += symbols[int(cell)]
+              result += "\n"
+          return result
 
       def valid_moves(self):
-          return [i for i in range(9) if self.board[i] == 0]
+          return list(range(4))  # All directions always available to try
+
+      def is_solved(self):
+          # Check if box is on target
+          return np.any((self.grid == 2) & (self.grid == 3))  # This is simplified
   ```
 
   Call the environment `CustomEnv`. Do not include any code that creates the gym environment or tests it. Make sure the environment is fully functional, requires no modifications and adheres to the requirements specified in the prompt. Do not include any placeholder functions or TODOs in the code.
-model: o1
-max_tokens: 4096
-num_games: 1000
+model: o3
+max_completion_tokens: 8192
+num_games: 1

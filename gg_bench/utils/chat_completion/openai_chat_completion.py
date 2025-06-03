@@ -37,14 +37,12 @@ class OpenAIChatCompletion(ChatCompletionProvider):
             )
             config = load_yaml(openai_config_path)
             api_key = config["api_key"]
-            openai.organization = config.get("organization", None)
-            os.environ["OPENAI_ORG_ID"] = config.get("organization", None) or ""
 
         openai.api_key = api_key
         os.environ["OPENAI_API_KEY"] = api_key
 
-        self.client = openai.OpenAI(base_url=base_url)
-        self.async_client = openai.AsyncOpenAI(base_url=base_url)
+        self.client = openai.OpenAI(base_url="https://oneapi.deepwisdom.ai/v1")
+        self.async_client = openai.AsyncOpenAI(base_url="https://oneapi.deepwisdom.ai/v1")
 
     @retry(
         wait=wait_random_exponential(min=1, max=60),
@@ -57,8 +55,8 @@ class OpenAIChatCompletion(ChatCompletionProvider):
         usage_tracker: Optional[UsageTracker] = None,
         **kwargs,
     ) -> str:
-        if self.model.startswith("o") and "max_tokens" in kwargs:
-            del kwargs["max_tokens"]
+        if self.model.startswith("o") and "max_completion_tokens" in kwargs:
+            del kwargs["max_completion_tokens"]
 
         response = self.client.chat.completions.create(
             model=self.model, messages=messages, **kwargs  # type: ignore
@@ -82,8 +80,8 @@ class OpenAIChatCompletion(ChatCompletionProvider):
         usage_tracker: Optional[UsageTracker] = None,
         **kwargs,
     ) -> str:
-        if self.model.startswith("o1") and "max_tokens" in kwargs:
-            del kwargs["max_tokens"]
+        if self.model.startswith("o1") and "max_completion_tokens" in kwargs:
+            del kwargs["max_completion_tokens"]
 
         response = await self.async_client.chat.completions.create(
             model=self.model, messages=messages, **kwargs  # type: ignore

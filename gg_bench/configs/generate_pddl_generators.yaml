@@ -1,0 +1,131 @@
+prompt: |
+  <GameDescription>
+
+  Here is some python code that defines a gym environment for this game:
+  ```python
+  <PythonCode>
+  ```
+
+  Based on the game description and the provided Gym environment implementation above, write a PDDL-based level generator that creates valid, solvable levels for this puzzle game in the exact format expected by the Gym environment.
+
+  The generator must include the following components:
+
+  ## 1. PDDL Domain Definition
+  A complete PDDL domain file that formally describes:
+  - All object types (player, tiles, items, phases, etc.)
+  - All predicates (state properties like position, activation status, phase, etc.)
+  - All actions (move directions, interactions, phase-shift, etc.) with preconditions and effects
+  - Proper PDDL 2.1+ syntax
+
+  **Wrap the full PDDL domain file in a code block marked with `~~~pddl` and `~~~` (not triple backticks), so it can be extracted and saved as a standalone file.**
+
+  ## 2. Level Generator Class
+  A Python class `PDDLLevelGenerator` with these required methods:
+
+  ```python
+  class PDDLLevelGenerator:
+      def __init__(self, difficulty='medium', seed=None):
+          # Initialize with difficulty constraints and random seed
+          
+      def generate_level(self) -> Dict:
+          # Generate a single level and return level data compatible with Gym environment
+          
+      def generate_batch(self, count=10) -> List[Dict]:
+          # Generate multiple levels efficiently
+          
+      def validate_level(self, level_data) -> Dict:
+          # Use PDDL planner to verify solvability and return validation info
+          # Return: {"solvable": bool, "optimal_steps": int, "solution": List[str]}
+          
+      def save_level(self, level_data, filepath):
+          # Save level in exact format expected by Gym environment
+          # Analyze the Gym __init__ method to determine required file formats
+          
+      def get_difficulty_constraints(self) -> Dict:
+          # Return current difficulty parameters and constraints
+
+  ## 3. Critical Requirements - Match Gym Environment Exactly
+  File Format Compatibility:
+
+  Analyze the Gym environment's __init__ method to determine expected file formats
+  Use identical character encodings as defined in the Gym environment
+  Follow the exact directory structure and naming conventions
+  Generate any metadata files the Gym environment expects to load
+
+  Character Encoding:
+
+  Use the exact same character-to-game-element mapping as the Gym environment
+  Ensure player start positions, walls, objectives, etc. use identical symbols
+  Maintain consistency between different phases/layers if applicable
+
+  Level Structure:
+
+  Generate levels that match the size constraints in the Gym environment
+  Respect any grid dimensions, boundary conditions, or layout requirements
+  Ensure generated levels can be successfully loaded by env.reset()
+
+  ## 4. PDDL Planner Integration
+  Use a PDDL planner (pyperplan, fast-downward, or similar) to:
+
+  Verify each generated level has at least one solution
+  Calculate optimal solution length for difficulty calibration
+  Reject impossible or trivial levels
+  Generate reference solutions for testing
+
+  ## 5. Difficulty Progression
+  Implement difficulty scaling through:
+
+  Easy: Smaller maps, direct paths, minimal coordination required
+  Medium: Moderate complexity, some backtracking, multi-step solutions
+  Hard: Large maps, complex interdependencies, optimal planning required
+
+  Control difficulty via:
+
+  Map size and obstacle density
+  Number of objectives/items to collect
+  Required coordination between game mechanics
+  Solution path length and decision points
+
+  ## 6. Robust Generation & Validation
+
+  Include comprehensive error handling for PDDL planning failures
+  Retry generation if levels don't meet quality standards
+  Log generation statistics and success rates
+  Support deterministic generation with seeds for reproducibility
+
+  ## 7. Output Requirements
+  The generator must produce levels that:
+
+  Load successfully in the provided Gym environment without any modifications
+  Pass the environment's is_solved() method when completed correctly
+  Have validated solutions that work with the environment's step() method
+  Include all necessary metadata for training and evaluation
+
+  Implementation Requirements
+
+  Use proper PDDL syntax and tested planners
+  Include all necessary imports and dependencies
+  Be fully functional with no placeholder functions or TODOs
+  Handle edge cases and provide meaningful error messages
+  Include docstrings and usage examples
+
+  Example Usage Structure
+  python# The generator should work like this:
+  generator = PDDLLevelGenerator(difficulty='medium', seed=42)
+  level_data = generator.generate_level()
+
+  # Save in format compatible with Gym environment
+  generator.save_level(level_data, "path/to/level")
+
+  # Verify compatibility
+  env = CustomEnv()  # Load the generated level
+  assert env.is_solved() == False  # Level should start unsolved
+  Make the generator fully compatible with the provided Gym environment code. Pay special attention to the environment's initialization, file loading patterns, and internal representations.
+
+
+model: o3
+max_completion_tokens: 8192
+num_games: 1
+generate_test_levels: true
+only_validate_and_test: true
+

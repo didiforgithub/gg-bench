@@ -1,0 +1,13 @@
+[
+  {
+    "game_idx": 1,
+    "generator_functional": true,
+    "difficulties_supported": [],
+    "generation_success_rate": {},
+    "errors": [
+      "Difficulty easy: 'Error unknown predicate not used in precondition of action'",
+      "Difficulty medium: unsupported operand type(s) for |: 'list' and 'set'",
+      "Difficulty hard: unsupported operand type(s) for |: 'list' and 'set'"
+    ]
+  }
+]
