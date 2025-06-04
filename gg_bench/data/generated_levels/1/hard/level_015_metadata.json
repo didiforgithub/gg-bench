@@ -1,0 +1,44 @@
+{
+  "game_idx": 1,
+  "difficulty": "hard",
+  "level_id": 15,
+  "pddl_validation": {
+    "solvable": true,
+    "optimal_steps": 24,
+    "solution": [
+      "(shift-alpha-beta c1_1)",
+      "(move-south c1_1 c2_1 beta)",
+      "(move-east c2_1 c2_2 beta)",
+      "(move-south c2_2 c3_2 beta)",
+      "(move-east c3_2 c3_3 beta)",
+      "(move-east c3_3 c3_4 beta)",
+      "(move-south c3_4 c4_4 beta)",
+      "(move-east c4_4 c4_5 beta)",
+      "(move-east c4_5 c4_6 beta)",
+      "(shift-beta-alpha c4_6)",
+      "(move-south c4_6 c5_6 alpha)",
+      "(move-west c5_6 c5_5 alpha)",
+      "(move-west c5_5 c5_4 alpha)",
+      "(move-west c5_4 c5_3 alpha)",
+      "(move-north c5_3 c4_3 alpha)",
+      "(move-north c4_3 c3_3 alpha)",
+      "(move-north c3_3 c2_3 alpha)",
+      "(move-south c2_3 c3_3 alpha)",
+      "(move-south c3_3 c4_3 alpha)",
+      "(move-south c4_3 c5_3 alpha)",
+      "(move-west c5_3 c5_2 alpha)",
+      "(move-west c5_2 c5_1 alpha)",
+      "(move-south c5_1 c6_1 alpha)",
+      "(move-south c6_1 c7_1 alpha)"
+    ]
+  },
+  "gym_compatible": true,
+  "constraints": {
+    "difficulty": "hard",
+    "size": 9,
+    "num_beacons": 3,
+    "uses_key_gate": true,
+    "rift_chance": 0.1
+  },
+  "generation_timestamp": "71292.138048916"
+}

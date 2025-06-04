@@ -1,0 +1,33 @@
+{
+  "game_idx": 1,
+  "difficulty": "hard",
+  "level_id": 8,
+  "pddl_validation": {
+    "solvable": true,
+    "optimal_steps": 13,
+    "solution": [
+      "(move-east c1_1 c1_2 alpha)",
+      "(move-east c1_2 c1_3 alpha)",
+      "(move-east c1_3 c1_4 alpha)",
+      "(move-east c1_4 c1_5 alpha)",
+      "(shift-alpha-beta c1_5)",
+      "(move-south c1_5 c2_5 beta)",
+      "(move-south c2_5 c3_5 beta)",
+      "(move-south c3_5 c4_5 beta)",
+      "(move-south c4_5 c5_5 beta)",
+      "(move-east c5_5 c5_6 beta)",
+      "(move-south c5_6 c6_6 beta)",
+      "(move-east c6_6 c6_7 beta)",
+      "(move-south c6_7 c7_7 beta)"
+    ]
+  },
+  "gym_compatible": true,
+  "constraints": {
+    "difficulty": "hard",
+    "size": 9,
+    "num_beacons": 3,
+    "uses_key_gate": true,
+    "rift_chance": 0.1
+  },
+  "generation_timestamp": "71291.25347075"
+}

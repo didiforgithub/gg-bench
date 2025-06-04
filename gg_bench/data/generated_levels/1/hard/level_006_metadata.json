@@ -1,0 +1,52 @@
+{
+  "game_idx": 1,
+  "difficulty": "hard",
+  "level_id": 6,
+  "pddl_validation": {
+    "solvable": true,
+    "optimal_steps": 32,
+    "solution": [
+      "(move-east c1_1 c1_2 alpha)",
+      "(move-east c1_2 c1_3 alpha)",
+      "(move-east c1_3 c1_4 alpha)",
+      "(move-east c1_4 c1_5 alpha)",
+      "(move-east c1_5 c1_6 alpha)",
+      "(move-south c1_6 c2_6 alpha)",
+      "(move-south c2_6 c3_6 alpha)",
+      "(move-south c3_6 c4_6 alpha)",
+      "(move-south c4_6 c5_6 alpha)",
+      "(move-south c5_6 c6_6 alpha)",
+      "(move-east c6_6 c6_7 alpha)",
+      "(move-south c6_7 c7_7 alpha)",
+      "(move-west c7_7 c7_6 alpha)",
+      "(move-east c7_6 c7_7 alpha)",
+      "(move-north c7_7 c6_7 alpha)",
+      "(move-north c6_7 c5_7 alpha)",
+      "(move-north c5_7 c4_7 alpha)",
+      "(move-west c4_7 c4_6 alpha)",
+      "(move-north c4_6 c3_6 alpha)",
+      "(move-north c3_6 c2_6 alpha)",
+      "(move-north c2_6 c1_6 alpha)",
+      "(move-east c1_6 c1_7 alpha)",
+      "(move-south c1_7 c2_7 alpha)",
+      "(shift-alpha-beta c2_7)",
+      "(move-south c2_7 c3_7 beta)",
+      "(move-west c3_7 c3_6 beta)",
+      "(move-south c3_6 c4_6 beta)",
+      "(shift-beta-alpha c4_6)",
+      "(move-south c4_6 c5_6 alpha)",
+      "(move-south c5_6 c6_6 alpha)",
+      "(move-south c6_6 c7_6 alpha)",
+      "(move-east c7_6 c7_7 alpha)"
+    ]
+  },
+  "gym_compatible": true,
+  "constraints": {
+    "difficulty": "hard",
+    "size": 9,
+    "num_beacons": 3,
+    "uses_key_gate": true,
+    "rift_chance": 0.1
+  },
+  "generation_timestamp": "71291.01075425"
+}
