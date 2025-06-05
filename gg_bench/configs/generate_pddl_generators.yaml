@@ -34,8 +34,35 @@ prompt: |
           # Generate multiple levels efficiently
           
       def validate_level(self, level_data) -> Dict:
-          # Use PDDL planner to verify solvability and return validation info
-          # Return: {"solvable": bool, "optimal_steps": int, "solution": List[str]}
+          # It utilizes PDDLValidator and PDDLPlanner, callable from gg_bench.utils.pddl_tools.
+          # Example Instantiation and Usage (actual instantiation of self.validator and
+          # self.planner might occur in the __init__ method of PDDLLevelGenerator,
+          # or they could be instantiated locally here if preferred):
+          #
+          # from gg_bench.utils.pddl_tools import PDDLValidator, PDDLPlanner # Import statement
+          #
+          # # Assuming self.validator and self.planner are instances:
+          # # self.validator = PDDLValidator()
+          # # self.planner = PDDLPlanner()
+          #
+          # # 1. Validate the PDDL files.
+          # # Assuming domain_file_path and problem_file_path are strings representing the paths:
+          # validation_successful = self.validator.validate_pddl(domain_file_path, problem_file_path)
+          # # 'validation_successful' is a boolean indicating if PDDL files are syntactically
+          # # and semantically correct according to the PDDLValidator.
+          #
+          # if not validation_successful:
+          #     return {"solvable": False, "optimal_steps": -1, "solution": []}
+          #
+          # # 2. If PDDL is valid, attempt to generate a plan.
+          # plan_actions = self.planner.generate_plan(domain_file_path, problem_file_path)
+          # # 'plan_actions' is expected to be a list of action strings (e.g., ["(action1 param)", "(action2)"])
+          # # if a plan is found, otherwise it might be None or an empty list.
+          #
+          # if plan_actions and len(plan_actions) > 0: # Check if a non-empty plan was returned
+          #     return {"solvable": True, "optimal_steps": len(plan_actions), "solution": plan_actions}
+          # else:
+          #     return {"solvable": False, "optimal_steps": -1, "solution": []}
           
       def save_level(self, level_data, filepath):
           # Save level in exact format expected by Gym environment
@@ -65,7 +92,7 @@ prompt: |
   Ensure generated levels can be successfully loaded by env.reset()
 
   ## 4. PDDL Planner Integration
-  Use a PDDL planner (pyperplan, fast-downward, or similar) to:
+  Use a PDDL planner to:
 
   Verify each generated level has at least one solution
   Calculate optimal solution length for difficulty calibration
@@ -105,6 +132,7 @@ prompt: |
 
   Use proper PDDL syntax and tested planners
   Include all necessary imports and dependencies
+  **Do NOT** include statements like from XXX import PDDLLevelGenerator
   Be fully functional with no placeholder functions or TODOs
   Handle edge cases and provide meaningful error messages
   Include docstrings and usage examples
@@ -118,14 +146,15 @@ prompt: |
   generator.save_level(level_data, "path/to/level")
 
   # Verify compatibility
+  from gg_bench.data.envs.env_1 import CustomEnv
   env = CustomEnv()  # Load the generated level
   assert env.is_solved() == False  # Level should start unsolved
   Make the generator fully compatible with the provided Gym environment code. Pay special attention to the environment's initialization, file loading patterns, and internal representations.
 
 
 model: o3
-max_completion_tokens: 8192
+max_completion_tokens: 4096
 num_games: 1
 generate_test_levels: true
-only_validate_and_test: true
+only_validate_and_test: false
 
